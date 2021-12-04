@@ -3,7 +3,7 @@ const TelegramBot = require('node-telegram-bot-api');
 
 const bot = new TelegramBot(process.env.BOT_TOKEN, {polling: true});
 const generate = require('./generate');
-const { add, list, mylist, removeLast } = require('./manager');
+const { add, list, mylist, removelast } = require('./manager');
 
 const startings = [
   'Como dijo un hombre sabio:',
