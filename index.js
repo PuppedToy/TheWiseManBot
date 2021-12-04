@@ -50,7 +50,7 @@ bot.onText(/\/add(.*)/, async (msg, match) => {
 bot.onText(/\/removelast/, async (msg) => {
   const chatId = msg.chat.id;
   try {
-    const deleted = await removelast();
+    const deleted = await removelast(msg.from.username);
     bot.sendMessage(chatId, `Has borrado la frase: "${deleted}."`);
   } catch (error) {
     console.error(error);
