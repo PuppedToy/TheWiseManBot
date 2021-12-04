@@ -35,7 +35,7 @@ async function list() {
   const sentences = await collection.find({}).toArray();
   client.close();
 
-  return sentences.map(({ sentence, author }) => `${sentence}${author?.username ? ` - @${author.username}` : ''}`);
+  return sentences.map(({ sentence, author }) => `${sentence}${author?.username ? `. - @${author.username}` : '.'}`);
 }
 
 async function mylist(username) {
@@ -43,7 +43,7 @@ async function mylist(username) {
   const sentences = await collection.find({ 'author.username': username }).toArray();
   client.close();
 
-  return sentences.map(({ sentence }) => sentence);
+  return sentences.map(({ sentence }) => `${sentence}.`);
 }
 
 module.exports = {
