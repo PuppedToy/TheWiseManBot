@@ -56,7 +56,7 @@ bot.onText(/\/list/, async (msg) => {
 
 bot.onText(/\/mylist/, async (msg) => {
   const chatId = msg.chat.id;
-  const sentences = await mylist();
+  const sentences = await mylist(msg.from.username);
   if (!sentences.length) {
     bot.sendMediaGroup(chatId, 'No existe ninguna frase a tu nombre. Utiliza el comando /add para añadir nuevas frases');
   }
