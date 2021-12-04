@@ -50,7 +50,7 @@ bot.onText(/\/list/, async (msg) => {
   }
   const preparedList = list.map((item, id) => `${id + 1}. ${item}`);
   for(let i = 0; i < preparedList.length; i += 5) {
-    bot.sendMessage(chatId, preparedList.slice(i, i + 5).join('\n'));
+    await bot.sendMessage(chatId, preparedList.slice(i, i + 5).join('\n'));
   }
 });
 
@@ -62,6 +62,6 @@ bot.onText(/\/mylist/, async (msg) => {
   }
   const preparedList = list.map((item, id) => `${id + 1}. ${item}`);
   for(let i = 0; i < preparedList.length; i += 5) {
-    bot.sendMessage(chatId, preparedList.slice(i, i + 5).join('\n'));
+    await bot.sendMessage(chatId, preparedList.slice(i, i + 5).join('\n'));
   }
 });
