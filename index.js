@@ -3,14 +3,14 @@ const TelegramBot = require('node-telegram-bot-api');
 
 const bot = new TelegramBot(process.env.BOT_TOKEN, {polling: true});
 const generate = require('./generate');
-const { add, list, mylist } = require('./manager');
+const { add, list, mylist, removeLast } = require('./manager');
 
 const startings = [
   'Como dijo un hombre sabio:',
   'Ya lo dijo un hombre sabio:',
 ];
 
-bot.onText(/\/wisdom/, async (msg, match) => {
+bot.onText(/\/wisdom/, async (msg) => {
   const chatId = msg.chat.id;
 
   const starting = startings.sample();
@@ -27,6 +27,10 @@ bot.onText(/\/add(.*)/, async (msg, match) => {
   const chatId = msg.chat.id;
   const [_, param] = match;
   const sentence = param.trim().replace(/(^"|"$)/g, '').replace(/\.$/, '');
+  if (!sentence) {
+    bot.sendMessage(chatId, 'Por favor, escribe la frase que quieres enviar. Por ejemplo:\n/add Esto es una frase de sabio.');
+    return;
+  }
   try {
     await add(
       {
@@ -36,6 +40,18 @@ bot.onText(/\/add(.*)/, async (msg, match) => {
       sentence
     );
     bot.sendMessage(chatId, `Has registrado la frase: "${sentence}."`);
+  } catch (error) {
+    console.error(error);
+    bot.sendMessage(chatId, 'Parece que ha habido un error. Prueba más tarde por favor.');
+  }
+});
+
+
+bot.onText(/\/removelast/, async (msg) => {
+  const chatId = msg.chat.id;
+  try {
+    const deleted = await removelast();
+    bot.sendMessage(chatId, `Has borrado la frase: "${deleted}."`);
   } catch (error) {
     console.error(error);
     bot.sendMessage(chatId, 'Parece que ha habido un error. Prueba más tarde por favor.');
