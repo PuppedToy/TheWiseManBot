@@ -44,11 +44,11 @@ bot.onText(/\/add(.*)/, async (msg, match) => {
 
 bot.onText(/\/list/, async (msg) => {
   const chatId = msg.chat.id;
-  const list = await list();
-  if (!list.length) {
+  const sentences = await list();
+  if (!sentences.length) {
     bot.sendMediaGroup(chatId, 'No existe ninguna frase. Utiliza el comando /add para añadir nuevas frases');
   }
-  const preparedList = list.map((item, id) => `${id + 1}. ${item}`);
+  const preparedList = sentences.map((item, id) => `${id + 1}. ${item}`);
   for(let i = 0; i < preparedList.length; i += 5) {
     await bot.sendMessage(chatId, preparedList.slice(i, i + 5).join('\n'));
   }
@@ -56,11 +56,11 @@ bot.onText(/\/list/, async (msg) => {
 
 bot.onText(/\/mylist/, async (msg) => {
   const chatId = msg.chat.id;
-  const list = await mylist();
-  if (!list.length) {
+  const sentences = await mylist();
+  if (!sentences.length) {
     bot.sendMediaGroup(chatId, 'No existe ninguna frase a tu nombre. Utiliza el comando /add para añadir nuevas frases');
   }
-  const preparedList = list.map((item, id) => `${id + 1}. ${item}`);
+  const preparedList = sentences.map((item, id) => `${id + 1}. ${item}`);
   for(let i = 0; i < preparedList.length; i += 5) {
     await bot.sendMessage(chatId, preparedList.slice(i, i + 5).join('\n'));
   }
