@@ -3,7 +3,7 @@ const TelegramBot = require('node-telegram-bot-api');
 
 const bot = new TelegramBot(process.env.BOT_TOKEN, {polling: true});
 const generate = require('./generate');
-const { add } = require('./manager');
+const { add, list, mylist } = require('./manager');
 
 const startings = [
   'Como dijo un hombre sabio:',
@@ -11,23 +11,22 @@ const startings = [
 ];
 
 bot.onText(/\/wisdom/, async (msg, match) => {
-  // 'msg' is the received Message from Telegram
-  // 'match' is the result of executing the regexp above on the text content
-  // of the message
-
   const chatId = msg.chat.id;
-  // const resp = match[1]; // the captured "whatever"
 
-  // send back the matched "whatever" to the chat
   const starting = startings.sample();
-  const sentence = await generate();
-  bot.sendMessage(chatId, `${starting} "${sentence}"`);
+  try {
+    const sentence = await generate();
+    bot.sendMessage(chatId, `${starting} "${sentence}"`);
+  }
+  catch (error) {
+    bot.sendMessage(chatId, 'Parece que ha habido un error. Prueba más tarde por favor.');
+  }
 });
 
 bot.onText(/\/add(.*)/, async (msg, match) => {
   const chatId = msg.chat.id;
   const [_, param] = match;
-  const sentence = param.trim().replace(/\.$/, '');
+  const sentence = param.trim().replace(/(^"|"$)/g, '').replace(/\.$/, '');
   try {
     await add(
       {
@@ -40,5 +39,29 @@ bot.onText(/\/add(.*)/, async (msg, match) => {
   } catch (error) {
     console.error(error);
     bot.sendMessage(chatId, 'Parece que ha habido un error. Prueba más tarde por favor.');
+  }
+});
+
+bot.onText(/\/list/, async (msg) => {
+  const chatId = msg.chat.id;
+  const list = await list();
+  if (!list.length) {
+    bot.sendMediaGroup(chatId, 'No existe ninguna frase. Utiliza el comando /add para añadir nuevas frases');
+  }
+  const preparedList = list.map((item, id) => `${id + 1}. ${item}`);
+  for(let i = 0; i < preparedList.length; i += 5) {
+    bot.sendMessage(chatId, preparedList.slice(i, i + 5).join('\n'));
+  }
+});
+
+bot.onText(/\/mylist/, async (msg) => {
+  const chatId = msg.chat.id;
+  const list = await mylist();
+  if (!list.length) {
+    bot.sendMediaGroup(chatId, 'No existe ninguna frase a tu nombre. Utiliza el comando /add para añadir nuevas frases');
+  }
+  const preparedList = list.map((item, id) => `${id + 1}. ${item}`);
+  for(let i = 0; i < preparedList.length; i += 5) {
+    bot.sendMessage(chatId, preparedList.slice(i, i + 5).join('\n'));
   }
 });

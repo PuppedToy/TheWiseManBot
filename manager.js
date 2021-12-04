@@ -11,23 +11,36 @@ async function getCollection(collectionName) {
 }
 
 async function add(author, sentence) {
-  console.log('add');
   const collection = await getCollection('sentences');
   await collection.insertOne({ author, sentence });
   client.close();
 }
 
 async function addMany(author, sentences) {
-  console.log('addMany');
   const collection = await getCollection('sentences');
   await collection.insertMany(sentences.map(sentence => ({ author, sentence })));
   client.close();
 }
 
 async function get() {
-  console.log('get');
   const collection = await getCollection('sentences');
   const sentences = await collection.find({}).toArray();
+  client.close();
+
+  return sentences.map(({ sentence }) => sentence);
+}
+
+async function list() {
+  const collection = await getCollection('sentences');
+  const sentences = await collection.find({}).toArray();
+  client.close();
+
+  return sentences.map(({ sentence, author }) => `${sentence} - @${author.username}`);
+}
+
+async function mylist(username) {
+  const collection = await getCollection('sentences');
+  const sentences = await collection.find({ 'author.username': username }).toArray();
   client.close();
 
   return sentences.map(({ sentence }) => sentence);
@@ -37,4 +50,6 @@ module.exports = {
   add,
   addMany,
   get,
+  list,
+  mylist,
 };
