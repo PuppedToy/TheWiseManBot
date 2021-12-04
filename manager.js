@@ -48,10 +48,10 @@ async function mylist(username) {
 
 async function removelast(username) {
   const collection = await getCollection('sentences');
-  const sentences = await collection.find({}).toArray();
+  const sentences = await collection.find({ 'author.username': username }).toArray();
   const last = sentences[sentences.length-1];
   if (!last || !last._id) throw new Error('Last id is undefined');
-  await collection.deleteOne({ _id: last._id, 'author.username': username });
+  await collection.deleteOne({ _id: last._id });
   client.close();
   
   return last.sentence;
