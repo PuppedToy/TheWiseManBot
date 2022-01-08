@@ -84,9 +84,7 @@ async function generate() {
       return `${sentence[0].toUpperCase()}${sentence.substr(1)}`
     })
     .join(' . ')
-    .replace(/ ([^a-záéíóúüñ"' ]) /gi, '$1 ')
-    .replace(/(?<=^|[,.!?:;])([^,.!?:;]*?)!/gi, ' ¡$1!')
-    .replace(/(?<=^|[,.!?:;])([^,.!?:;]*?)\?/gi, ' ¿$1?');
+    .replace(/ ([^a-záéíóúüñ"' ]) /gi, '$1 ');
 
   return `${result}.`;
 }
