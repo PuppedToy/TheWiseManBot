@@ -26,7 +26,7 @@ bot.onText(/\/wisdom/, async (msg) => {
 bot.onText(/\/add(.*)/, async (msg, match) => {
   const chatId = msg.chat.id;
   const [_, param] = match;
-  const sentence = param.trim().replace(/(^"|"$)/g, '').replace(/\.$/, '');
+  const sentence = param.trim().replace(/(^"|"$)/g, '').replace(/\.$/, '').replace(/[¡¿]/g, '');
   if (!sentence) {
     bot.sendMessage(chatId, 'Por favor, escribe la frase que quieres enviar. Por ejemplo:\n/add Esto es una frase de sabio.');
     return;
