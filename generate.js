@@ -1,9 +1,30 @@
 Array.prototype.sample = require('array-sample');
+Array.prototype.weighedSample = function(weight = 0.5) {
+  if (this.length < 1) {
+    return undefined;
+  }
+
+  for (let element = 0; element < this.length; element += 1) {
+    if (Math.random() < weight) {
+      return this[element]
+    }
+  }
+
+  return this[this.length-1];
+}
 const { get } = require('./manager');
 
-async function generate() {
+const equivalentTokens = [
+  ['un', 'el', 'al'],
+  ['una', 'la'],
+  ['es', 'está']
+];
+
+const irrelevantTokens = ['como'];
+
+async function generate(min = 3, max = 7) {
   const sentences = await get();
-  const amountSentences = parseInt(Math.random()*5+3);
+  const amountSentences = parseInt(Math.random()*(max-min+1)+min);
   const chosenSentences = [];
   for(let i = 0; i < amountSentences; i++) {
     let nextSentence;
@@ -56,7 +77,7 @@ async function generate() {
     const tokensToNext = currentSentence
       .filter(({ joints }) => joints.some(jointFilter));
     if (tokensToNext.length) {
-      const chosenToken = tokensToNext.sample();
+      const chosenToken = tokensToNext.weighedSample();
       const chosenJoint = chosenToken.joints.filter(jointFilter).sample();
       currentSentence.splice(chosenToken.id + 1, currentSentence.length);
       tokenizedSentences[i + jump].splice(0, chosenJoint[1] + 1);
@@ -80,7 +101,6 @@ async function generate() {
     .join(' ')
     .split(' . ')
     .map((sentence) => {
-      // console.log(sentence, sentence[0]);
       return `${sentence[0].toUpperCase()}${sentence.substr(1)}`
     })
     .join(' . ')
