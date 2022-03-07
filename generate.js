@@ -1,12 +1,21 @@
 Array.prototype.sample = require('array-sample');
-Array.prototype.weighedSample = function(weight = 0.5) {
+Array.prototype.weighedSample = function(weight = 0.5, reversed = false) {
   if (this.length < 1) {
     return undefined;
   }
 
-  for (let element = 0; element < this.length; element += 1) {
-    if (Math.random() < weight) {
-      return this[element]
+  if (!reversed) {
+    for (let element = 0; element < this.length; element += 1) {
+      if (Math.random() < weight) {
+        return this[element]
+      }
+    }
+  }
+  else {
+    for (let element = this.length-1; element >= 0; element -= 1) {
+      if (Math.random() < weight) {
+        return this[element]
+      }
     }
   }
 
@@ -78,7 +87,9 @@ async function generate(min = 3, max = 7) {
       .filter(({ joints }) => joints.some(jointFilter));
     if (tokensToNext.length) {
       const chosenToken = tokensToNext.weighedSample();
-      const chosenJoint = chosenToken.joints.filter(jointFilter).sample();
+      const filteredJoints = chosenToken.joints.filter(jointFilter);
+      const chosenJoint = i < tokenizedSentences.length - jump - 1 ? 
+        filteredJoints.sample() : filteredJoints.weighedSample(0.3, true);
       currentSentence.splice(chosenToken.id + 1, currentSentence.length);
       tokenizedSentences[i + jump].splice(0, chosenJoint[1] + 1);
       tokenizedSentences[i + jump].forEach((token, id) => {
