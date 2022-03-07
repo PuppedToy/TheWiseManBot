@@ -89,7 +89,7 @@ async function generate(min = 3, max = 7) {
       const chosenToken = tokensToNext.weighedSample();
       const filteredJoints = chosenToken.joints.filter(jointFilter);
       const chosenJoint = i < tokenizedSentences.length - jump - 1 ? 
-        filteredJoints.sample() : filteredJoints.weighedSample(0.3, true);
+        filteredJoints.sample() : filteredJoints.weighedSample(0.5, true);
       currentSentence.splice(chosenToken.id + 1, currentSentence.length);
       tokenizedSentences[i + jump].splice(0, chosenJoint[1] + 1);
       tokenizedSentences[i + jump].forEach((token, id) => {
