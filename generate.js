@@ -22,6 +22,8 @@ Array.prototype.weighedSample = function(weight = 0.5, reversed = false) {
   return this[this.length-1];
 }
 const { get } = require('./manager');
+const tokenize = require('./tokenize');
+const applyChaos = require('./chaos');
 
 const equivalentTokens = [
   ['un', 'el', 'al'],
@@ -31,7 +33,7 @@ const equivalentTokens = [
 
 const irrelevantTokens = ['como'];
 
-async function generate(min = 3, max = 7) {
+async function generate(min = 3, max = 7, chaos = 0) {
   const sentences = await get();
   const amountSentences = parseInt(Math.random()*(max-min+1)+min);
   const chosenSentences = [];
@@ -43,39 +45,7 @@ async function generate(min = 3, max = 7) {
     chosenSentences.push(nextSentence);
   }
 
-  const tokenizedSentences = chosenSentences.map(sentence => {
-    const sentenceTokensParsed = sentence.toLowerCase()
-      .replace(/([^a-záéíóúüñ"' ]+)/gi, ' $1 ')
-      .replace(/ {2,}/g, ' ');
-    const sentenceTokens = sentenceTokensParsed.split(' ');
-    return sentenceTokens.map((token, id) => ({
-      id,
-      token,
-      joints: [],
-    }));
-  });
-
-  const graph = [];
-
-  tokenizedSentences.forEach((tokens, id) => {
-    tokens.forEach((currentToken) => {
-      tokenizedSentences.forEach((targetTokens, targetId) => {
-        if (targetId !== id) {
-          targetTokens.forEach(({ token }, tokenId) => {
-            if (token === currentToken.token) {
-              currentToken.joints.push([targetId, tokenId]);
-              if (!graph[id]) {
-                graph[id] = [];
-              }
-              if (!graph[id].includes(targetId)) {
-                graph[id].push(targetId);
-              }
-            }
-          });
-        }
-      });
-    });
-  });
+  const tokenizedSentences = tokenize(chosenSentences);
   
   let skip = [];
   let jump = 1;
@@ -104,12 +74,18 @@ async function generate(min = 3, max = 7) {
     }
   }
 
-  let result = tokenizedSentences
+  const filteredTokenizedSentences = tokenizedSentences
     .filter((_, id) => !skip.includes(id))
     .map(sentence => 
       sentence.map(({ token }) => token).join(' ')
     )
-    .join(' ')
+    .join(' ');
+
+  let chaoticTokenizedSentences = filteredTokenizedSentences;
+  if (chaos === 'auto') chaoticTokenizedSentences = await applyChaos(filteredTokenizedSentences);
+  else if (chaos) chaoticTokenizedSentences = await applyChaos(filteredTokenizedSentences, chaos);
+  
+  let result = chaoticTokenizedSentences
     .split(' . ')
     .map((sentence) => {
       return `${sentence[0].toUpperCase()}${sentence.substr(1)}`

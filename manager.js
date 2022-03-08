@@ -57,6 +57,36 @@ async function removelast(username) {
   return last.sentence;
 }
 
+async function findBigrams(bigram) {
+  const collection = await getCollection('ngrams');
+  const ngrams = await collection.find({ $and: [
+    { nth: 2 },
+    { $or: [
+      { "words.0": bigram[0] },
+      { "words.1": bigram[1] },
+    ] }
+  ] }).toArray();
+  client.close();
+  
+  return ngrams.map(({ words }) => words);
+}
+
+async function deleteNgrams(nth) {
+  const collection = await getCollection('ngrams');
+  if (!nth) {
+    await collection.deleteMany();
+  } else {
+    await collection.deleteMany({ nth });
+  }
+  client.close();
+}
+
+async function addManyNgrams(ngrams, nth = 2) {
+  const collection = await getCollection('ngrams');
+  await collection.insertMany(ngrams.map(words => ({ words, nth })));
+  client.close();
+}
+
 module.exports = {
   add,
   addMany,
@@ -64,4 +94,7 @@ module.exports = {
   list,
   mylist,
   removelast,
+  findBigrams,
+  deleteNgrams,
+  addManyNgrams,
 };
