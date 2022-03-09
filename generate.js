@@ -23,7 +23,7 @@ Array.prototype.weighedSample = function(weight = 0.5, reversed = false) {
 }
 const { get } = require('./manager');
 const tokenize = require('./tokenize');
-const applyChaos = require('./chaos');
+const { applyChaos, applySoftChaos } = require('./chaos');
 
 const equivalentTokens = [
   ['un', 'el', 'al'],
@@ -83,6 +83,7 @@ async function generate(min = 3, max = 7, chaos = 0) {
 
   let chaoticTokenizedSentences = filteredTokenizedSentences;
   if (chaos === 'auto') chaoticTokenizedSentences = await applyChaos(filteredTokenizedSentences);
+  else if (chaos === 'soft') chaoticTokenizedSentences = await applySoftChaos(filteredTokenizedSentences);
   else if (chaos) chaoticTokenizedSentences = await applyChaos(filteredTokenizedSentences, chaos);
   
   let result = chaoticTokenizedSentences

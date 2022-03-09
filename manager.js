@@ -71,6 +71,22 @@ async function findBigrams(bigram) {
   return ngrams.map(({ words }) => words);
 }
 
+async function findTrigrams(trigram) {
+  const collection = await getCollection('ngrams');
+  const query = { $and: [
+    { nth: 3 },
+    { $and: [
+      { "words.0": trigram[0] },
+      { "words.1": { $not: new RegExp(`^${trigram[1]}$`) } },
+      { "words.2": trigram[2] },
+    ] }
+  ] };
+  const ngrams = await collection.find(query).toArray();
+  client.close();
+  
+  return ngrams.map(({ words }) => words);
+}
+
 async function deleteNgrams(nth) {
   const collection = await getCollection('ngrams');
   if (!nth) {
@@ -95,6 +111,7 @@ module.exports = {
   mylist,
   removelast,
   findBigrams,
+  findTrigrams,
   deleteNgrams,
   addManyNgrams,
 };

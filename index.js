@@ -36,7 +36,20 @@ bot.onText(/\/insight/, async (msg) => {
   }
 });
 
-bot.onText(/\/chaos(.*)/, async (msg, match) => {
+bot.onText(/\/chaos/, async (msg) => {
+  const chatId = msg.chat.id;
+
+  const starting = startings.sample();
+  try {
+    const sentence = await generate(3, 7, 'soft');
+    bot.sendMessage(chatId, `${starting} "${sentence}"`);
+  }
+  catch (error) {
+    bot.sendMessage(chatId, 'Parece que ha habido un error. Prueba más tarde por favor.');
+  }
+});
+
+bot.onText(/\/mayhem(.*)/, async (msg, match) => {
   const chatId = msg.chat.id;
   const [_, param] = match;
   const chaosLevel = parseInt(param.trim(), 10);
